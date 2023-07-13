@@ -4,10 +4,11 @@ import {Box, Button, Image, Text} from "@chakra-ui/react";
 
 type CardProps = {
     card: CardType,
-    updateCardNumber(card: CardType, increment: number): void
+    updateCardNumber(card: CardType, increment: number): void,
+    onPress(card: CardType): void
 }
 
-function Card({card, updateCardNumber}: CardProps) {
+function Card({card, updateCardNumber, onPress}: CardProps) {
     const [isHovered, setIsHovered] = useState(false)
 
     const onMouseEnter = () => {
@@ -28,7 +29,14 @@ function Card({card, updateCardNumber}: CardProps) {
     return (
         <Box width="240px" height="320px" _hover={{
             transform: "scale(1.1) translateY(-16px)",
-        }} pos="relative" transition="0.2s ease-out all" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+            cursor: "pointer"
+        }}
+             pos="relative"
+             transition="0.2s ease-out all"
+             onMouseEnter={onMouseEnter}
+             onMouseLeave={onMouseLeave}
+             onClick={() => onPress(card)}
+        >
             <Image width="240px" height="320px" src={card.image} alt={card.name}/>
             {isHovered && <Box
                 pos="absolute"

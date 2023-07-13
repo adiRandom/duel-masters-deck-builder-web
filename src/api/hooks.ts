@@ -1,8 +1,8 @@
 import {CardType} from "./types";
 import {useEffect, useState} from "react";
 
-const API_URL = 'https://europe-west1-duel-masters-builder.cloudfunctions.net/api';
-// const API_URL = 'http://127.0.0.1:5001/duel-masters-builder/europe-west1/api';
+// const API_URL = 'https://europe-west1-duel-masters-builder.cloudfunctions.net/api';
+const API_URL = 'http://127.0.0.1:5001/duel-masters-builder/europe-west1/api';
 
 type UseCardsParams = {
     onError: (error: string) => void;
