@@ -11,3 +11,23 @@ export type CardType = {
     image: string,
     count: number
 }
+
+export type Filter = {
+    field: keyof CardType
+    label: string,
+    type: "string"
+    permittedOperators: ("=" | "!=" | "contains" | "not contains" )[],
+    permittedValues?: string[]
+} | {
+    field: keyof CardType
+    label: string,
+    type: "number"
+    permittedOperators: ("=" | "!=" | ">" | "<" | ">=" | "<=")[]
+}
+
+export type AppliedFilter =  {
+    field: keyof CardType,
+    label: string,
+    operator: ("=" | "!=" | ">" | "<" | ">=" | "<=" | "contains" | "not contains"),
+    value: string | number
+}

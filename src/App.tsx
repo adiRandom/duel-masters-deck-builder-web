@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useCards} from "./api/hooks";
 import {
     Box,
@@ -17,7 +17,8 @@ import {
     Text
 } from "@chakra-ui/react";
 import Card from "./Card";
-import {CardType} from "./api/types";
+import {AppliedFilter, CardType} from "./api/types";
+import FilterBar from "./FilterBar";
 
 function App() {
 
@@ -29,6 +30,11 @@ function App() {
 
     const [cardName, setCardName] = useState("")
     const [selectedCard, setSelectedCard] = useState<CardType | null>(null)
+    const [filteredCards, setFilteredCards] = useState<CardType[]>([])
+
+    useEffect(() => {
+        setFilteredCards(cards)
+    }, [cards])
 
     const onKeyDown = (ev: React.KeyboardEvent<HTMLInputElement>) => {
         if (ev.key === "Enter") {
@@ -42,8 +48,43 @@ function App() {
         addCard(name)
     }
 
-    const capitalize = (s: string) => {
-        return s.charAt(0).toUpperCase() + s.slice(1)
+    const formatField = (s: string) => {
+        return (s.charAt(0).toUpperCase() + s.slice(1))
+    }
+
+    const getFilterFunction = (filter: AppliedFilter) => {
+        return (card: CardType) => {
+            switch (filter.operator) {
+                case "=":
+                    return card[filter.field] === filter.value
+                case "!=":
+                    return card[filter.field] !== filter.value
+                case ">":
+                    return card[filter.field] > filter.value
+                case "<":
+                    return card[filter.field] < filter.value
+                case "<=":
+                    return card[filter.field] <= filter.value
+                case ">=":
+                    return card[filter.field] >= filter.value
+                case "contains":
+                    return (typeof card[filter.field] === "string") &&
+                        (card[filter.field] as string).includes(filter.value as string)
+                case "not contains":
+                    return (typeof card[filter.field] === "string") &&
+                        !(card[filter.field] as string).includes(filter.value as string)
+            }
+        }
+    }
+
+    const applyFilters = (appliedFilters: AppliedFilter[]) => {
+        let newCards = cards
+
+        appliedFilters.forEach(filter =>{
+            newCards = newCards.filter(getFilterFunction(filter))
+        })
+
+        setFilteredCards(newCards)
     }
 
     return (
@@ -55,10 +96,13 @@ function App() {
                 <Button ml="16px" onClick={onAddCard}>Add</Button>
                 {isLoading && <Spinner ml="12px" color='red.500'/>}
             </Box>
-            <Box px="24px">
+            <Box px="32px">
                 <Heading as={"h1"} size="xl" mb="16px">Cards</Heading>
+                <Box my="12px">
+                    <FilterBar onApply={applyFilters}/>
+                </Box>
                 <Box display="flex" flexWrap="wrap" justifyContent="flex-start" gap="16px">
-                    {cards.map(card =>
+                    {filteredCards.map(card =>
                         (<Card updateCardNumber={updateCardNumber} key={card.name} card={card}
                                onPress={card => setSelectedCard(card)}/>))
                     }
@@ -67,7 +111,7 @@ function App() {
             <Modal isOpen={selectedCard !== null} onClose={() => setSelectedCard(null)}>
                 <ModalOverlay/>
                 <ModalContent maxW="80vw" width="80vw">
-                    <ModalHeader>{selectedCard?.name}</ModalHeader>
+                    <ModalHeader>{selectedCard?.name.replace(/_/g, " ")}</ModalHeader>
                     <ModalCloseButton/>
                     <ModalBody maxW="80vw" width="80vw" px="24px" py="12px">
                         <Flex width="80vw" py="36px" justifyContent="space-evenly">
@@ -77,11 +121,12 @@ function App() {
                                   maxW="50%" py="8px">
                                 {Object.entries(selectedCard ?? {}).map(([key, value]) =>
                                     (key !== "flavorText" && key !== "image" &&
-                                        <Flex className="card-info" mx="4px" borderBottom="1px solid #acacac" my="4px" alignItems="center">
+                                        <Flex className="card-info" mx="4px" borderBottom="1px solid #acacac" my="4px"
+                                              alignItems="center">
                                             <Text
                                                 fontSize="20px"
                                                 fontWeight="500"
-                                                mr="8px"> {capitalize(key)}
+                                                mr="8px"> {formatField(key)}
                                             </Text>
                                             <Text fontSize="16px">{value}</Text>
                                         </Flex>
