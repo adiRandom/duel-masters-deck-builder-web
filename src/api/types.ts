@@ -31,3 +31,21 @@ export type AppliedFilter =  {
     operator: ("=" | "!=" | ">" | "<" | ">=" | "<=" | "contains" | "not contains"),
     value: string | number
 }
+
+export type DeckType = {
+    name: string
+    cards: CardType[]
+    id: string
+}
+
+function randomInt() {
+    return Math.floor(Math.random() * 1000000)
+}
+
+export function newDeck(){
+    return {
+        name: "",
+        cards: [],
+        id: randomInt().toString()
+    }
+}

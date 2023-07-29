@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {SyntheticEvent, useState} from 'react'
 import {CardType} from "./api/types";
 import {Box, Button, Image, Text} from "@chakra-ui/react";
 
@@ -19,11 +19,13 @@ function Card({card, updateCardNumber, onPress}: CardProps) {
         setIsHovered(false)
     }
 
-    const onIncrement = () => {
+    const onIncrement = (ev: SyntheticEvent) => {
+        ev.stopPropagation()
         updateCardNumber(card, 1)
     }
 
-    const onDecrement = () => {
+    const onDecrement = (ev: SyntheticEvent) => {
+        ev.stopPropagation()
         updateCardNumber(card, -1)
     }
     return (

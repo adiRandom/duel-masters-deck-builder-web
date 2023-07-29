@@ -19,6 +19,7 @@ import {
 import Card from "./Card";
 import {AppliedFilter, CardType} from "./api/types";
 import FilterBar from "./FilterBar";
+import {Link} from "react-router-dom";
 
 function App() {
 
@@ -78,17 +79,20 @@ function App() {
     }
 
     const applyFilters = (appliedFilters: AppliedFilter[]) => {
-        let newCards = cards
+        const filterFunctions = appliedFilters.map(filter => getFilterFunction(filter))
 
-        appliedFilters.forEach(filter =>{
-            newCards = newCards.filter(getFilterFunction(filter))
-        })
+        let newCards = cards.filter(card =>
+            filterFunctions.reduce((acc, filter) =>
+                acc || filter(card), false)
+        )
+
 
         setFilteredCards(newCards)
     }
 
     return (
-        <Box width="100vw" height="100vh" py="24px" overflowY="auto">
+        <Box width="100vw" height="100vh" py="24px" overflowY="auto" pos="relative">
+            <Button pos="absolute" top="64px" right="64px"><Link to={"/deck"}>Go to decks</Link></Button>
             <Box width="100%" height="70%" display="flex" justifyContent="center" alignItems="center">
                 <Input placeholder="Card Name" width="50%" value={cardName}
                        onKeyDown={onKeyDown}
@@ -107,7 +111,7 @@ function App() {
                                onPress={card => setSelectedCard(card)}/>))
                     }
                 </Box>
-            </Box>
+            </Box>w
             <Modal isOpen={selectedCard !== null} onClose={() => setSelectedCard(null)}>
                 <ModalOverlay/>
                 <ModalContent maxW="80vw" width="80vw">

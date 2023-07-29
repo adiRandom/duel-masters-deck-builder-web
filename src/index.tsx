@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {ChakraProvider} from "@chakra-ui/react";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import Deck from "./Deck";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -14,6 +15,10 @@ const router = createBrowserRouter([
         {
             path: "/",
             element: <App/>
+        },
+        {
+            path: "/deck",
+            element: <Deck/>
         }
     ]
 );
