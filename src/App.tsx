@@ -17,9 +17,10 @@ import {
     Text
 } from "@chakra-ui/react";
 import Card from "./Card";
-import {AppliedFilter, CardType} from "./api/types";
+import {AppliedFilter, CardType, Filter} from "./api/types";
 import FilterBar from "./FilterBar";
 import {Link} from "react-router-dom";
+import SortDropdown, {SORT_OPTIONS} from "./SortDrpdown";
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
     const [cardName, setCardName] = useState("")
     const [selectedCard, setSelectedCard] = useState<CardType | null>(null)
     const [filteredCards, setFilteredCards] = useState<CardType[]>([])
+    const [sortBy, setSortBy] = useState<Filter>(SORT_OPTIONS[0])
 
     useEffect(() => {
         setFilteredCards(cards)
@@ -90,6 +92,18 @@ function App() {
         setFilteredCards(newCards)
     }
 
+    const getSortByFn = (field: keyof CardType) => {
+        return (a: CardType, b: CardType) => {
+            if (a[field] < b[field]) {
+                return -1
+            }
+            if (a[field] > b[field]) {
+                return 1
+            }
+            return 0
+        }
+    }
+
     return (
         <Box width="100vw" height="100vh" py="24px" overflowY="auto" pos="relative">
             <Button pos="absolute" top="64px" right="64px"><Link to={"/deck"}>Go to decks</Link></Button>
@@ -104,9 +118,12 @@ function App() {
                 <Heading as={"h1"} size="xl" mb="16px">Cards</Heading>
                 <Box my="12px">
                     <FilterBar onApply={applyFilters}/>
+                    <Box mt="8px">
+                        <SortDropdown sortBy={sortBy} onSortByChange={setSortBy}/>
+                    </Box>
                 </Box>
                 <Box display="flex" flexWrap="wrap" justifyContent="flex-start" gap="16px">
-                    {filteredCards.map(card =>
+                    {filteredCards.sort(getSortByFn(sortBy.field)).map(card =>
                         (<Card updateCardNumber={updateCardNumber} key={card.name} card={card}
                                onPress={card => setSelectedCard(card)}/>))
                     }

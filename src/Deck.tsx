@@ -16,9 +16,10 @@ import {
     Text
 } from "@chakra-ui/react";
 import Card from "./Card";
-import {AppliedFilter, CardType, DeckType, newDeck} from "./api/types";
+import {AppliedFilter, CardType, DeckType, Filter, newDeck} from "./api/types";
 import FilterBar from "./FilterBar";
 import {Link} from "react-router-dom";
+import SortDropdown, {SORT_OPTIONS} from "./SortDrpdown";
 
 
 function Deck() {
@@ -34,6 +35,8 @@ function Deck() {
     const [deck, setDeck] = useState<DeckType>(newDeck())
     const [isDeckUnsaved, setIsDeckUnsaved] = useState(false)
     const [showDeckCards, setShowDeckCards] = useState(false)
+    const [sortBy, setSortBy] = useState<Filter>(SORT_OPTIONS[0])
+
 
     useEffect(() => {
         setFilteredCards(cards)
@@ -51,6 +54,18 @@ function Deck() {
 
     const formatField = (s: string) => {
         return (s.charAt(0).toUpperCase() + s.slice(1))
+    }
+
+    const getSortByFn = (field: keyof CardType) => {
+        return (a: CardType, b: CardType) => {
+            if (a[field] < b[field]) {
+                return -1
+            }
+            if (a[field] > b[field]) {
+                return 1
+            }
+            return 0
+        }
     }
 
     const getFilterFunction = (filter: AppliedFilter) => {
@@ -182,9 +197,12 @@ function Deck() {
                 </Flex>
                 <Box my="12px">
                     <FilterBar onApply={applyFilters}/>
+                    <Box mt="8px">
+                        <SortDropdown sortBy={sortBy} onSortByChange={setSortBy}/>
+                    </Box>
                 </Box>
                 <Box display="flex" flexWrap="wrap" justifyContent="flex-start" gap="16px">
-                    {(showDeckCards ? deck.cards : filteredCards).map(card =>
+                    {(showDeckCards ? deck.cards : filteredCards).sort(getSortByFn(sortBy.field)).map(card =>
                         (<Card updateCardNumber={updateCardCountInDeck} key={card.name} card={card}
                                onPress={card => setSelectedCard(card)}/>))
                     }
